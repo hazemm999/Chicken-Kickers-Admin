@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<base target="_top">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حجوزات تشيكن كيكرز</title>
+<meta name="theme-color" content="#9c0f18">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fbf3ea;--panel:#fff;--ink:#1a0f0c;--soft:#8a7a72;--line:#f0e2d2;--red:#e11c26;--red-deep:#9c0f18;--red-dark:#5c0a10;--gold:#ffc629;--gold-deep:#e0a800;--ok:#1f8a4c;--font:'Cairo',sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font)}
+  button,input,select{font-family:var(--font)}
+  header{background:linear-gradient(135deg,var(--red-deep),var(--red-dark));color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  header h1{margin:0;font-size:20px;font-weight:900}
+  header h1 span{color:var(--gold)}
+  .hb{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{border:none;border-radius:9px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer}
+  .gold{background:var(--gold);color:var(--red-dark)}.gold:hover{background:var(--gold-deep)}
+  .ghost{background:rgba(255,255,255,.12);color:#fff}
+  main{max-width:900px;margin:0 auto;padding:18px 16px 60px}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .chip{border:1.5px solid var(--line);background:#fff;padding:7px 14px;border-radius:99px;font-weight:700;font-size:13px;cursor:pointer}
+  .chip.on{background:var(--red);border-color:var(--red);color:#fff}
+  .bar input,.bar select{padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;font-size:13px;background:#fff}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;border-inline-start:4px solid var(--red)}
+  .kpi:nth-child(2){border-color:var(--gold-deep)}.kpi:nth-child(3){border-color:var(--ok)}
+  .kpi b{display:block;font-size:24px;font-weight:900}.kpi span{font-size:12px;color:var(--soft);font-weight:700}
+  .day{font-size:13px;font-weight:800;color:var(--soft);margin:18px 2px 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .time{min-width:56px;text-align:center;font-weight:900;font-size:17px;color:var(--red-deep)}
+  .info{flex:1;min-width:150px}.info b{font-size:15px}
+  .meta{font-size:12px;color:var(--soft);font-weight:600;margin-top:2px}
+  .badge{padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:800}
+  .new{background:#fff3cf;color:#8a6500}.ok{background:#e3f4ea;color:var(--ok)}.no{background:#fde7e8;color:var(--red-deep)}
+  .acts{display:flex;gap:6px;flex-wrap:wrap}
+  .acts .btn{padding:6px 12px;font-size:12.5px}
+  .b-ok{background:var(--ok);color:#fff}.b-no{background:#fde7e8;color:var(--red-deep)}.b-wa{background:var(--gold);color:var(--red-dark)}
+  .empty{text-align:center;color:var(--soft);padding:40px 0;font-weight:700}
+  .ov{position:fixed;inset:0;background:linear-gradient(135deg,var(--red-deep),var(--red-dark));display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+  .box{background:#fff;border-radius:16px;padding:26px 22px;width:100%;max-width:340px;text-align:center}
+  .box h2{margin:0 0 14px;font-size:19px;font-weight:900}
+  .box input,.box select{width:100%;padding:11px 12px;border:2px solid var(--line);border-radius:10px;font-size:14px;margin-top:8px;background:#fff8ef}
+  .box .btn{width:100%;margin-top:10px;padding:11px;font-size:15px}
+  .err{color:var(--red);font-size:13px;font-weight:700;min-height:18px;margin-top:6px}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--red-dark);color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s}
+  .toast.show{opacity:1}
+  @media(max-width:520px){.kpis{gap:6px}.kpi b{font-size:20px}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍗 تشيكن <span>كيكرز</span> — الحجوزات</h1>
+  <div class="hb">
+    <button class="btn gold" id="addBtn">+ حجز</button>
+    <button class="btn ghost" id="refBtn">تحديث</button>
+    <button class="btn ghost" id="outBtn">خروج</button>
+  </div>
+</header>
+
+<main>
+  <div class="bar">
+    <button class="chip on" data-q="today">اليوم</button>
+    <button class="chip" data-q="tomorrow">بكرة</button>
+    <button class="chip" data-q="week">الأسبوع</button>
+    <button class="chip" data-q="all">الكل</button>
+    <input type="date" id="fDate">
+    <select id="fBranch"><option value="">كل الفروع</option></select>
+    <select id="fStatus"><option value="">كل الحالات</option><option>جديد</option><option>مؤكد</option><option>ملغي</option></select>
+    <input type="text" id="fSearch" placeholder="بحث بالاسم أو الموبايل">
+  </div>
+  <div class="kpis">
+    <div class="kpi"><b id="kN">0</b><span>حجوزات</span></div>
+    <div class="kpi"><b id="kG">0</b><span>أشخاص (غير الملغي)</span></div>
+    <div class="kpi"><b id="kNew">0</b><span>محتاجة تأكيد</span></div>
+  </div>
+  <div id="list"><div class="empty">جاري التحميل…</div></div>
+</main>
+
+<div class="ov" id="login"><div class="box">
+  <h2>🍗 حجوزات تشيكن كيكرز</h2>
+  <input type="password" id="lp" placeholder="كلمة السر">
+  <div class="err" id="le"></div>
+  <button class="btn gold" id="lb">دخول</button>
+</div></div>
+
+<div class="ov" id="addM"><div class="box">
+  <h2>حجز يدوي</h2>
+  <input id="aName" placeholder="الاسم">
+  <input id="aPhone" placeholder="الموبايل" type="tel">
+  <input id="aBranch" list="bl" placeholder="الفرع"><datalist id="bl"></datalist>
+  <input id="aDate" type="date">
+  <input id="aTime" type="time">
+  <select id="aG"><option>1</option><option>2</option><option selected>4</option><option>6</option><option>8</option><option>10</option></select>
+  <button class="btn gold" id="aOk">حفظ</button>
+  <button class="btn" id="aNo" style="background:#f0e2d2">إلغاء</button>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // لينك الـ Web App (/exec) — بيتستخدم لما الصفحة تتفتح كملف عادي برّه Apps Script
+  const API_URL = "https://script.google.com/macros/s/AKfycbznbA70VRWOS2dOYCMuGbohd5BVPbPQ6UO3QP3dFqVgsDRgWYZQeqiKeq3spzmfGGRWeA/exec";
+  const inside = typeof google !== 'undefined' && google.script && google.script.run;
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const today = (o = 0) => { const d = new Date(); d.setDate(d.getDate() + o); return d.toLocaleDateString('en-CA'); };
+  let pass = '', all = [], week = false;
+  try { pass = localStorage.getItem('ckPass') || ''; } catch (e) {}
+
+  function toast(m) { $('toast').textContent = m; $('toast').classList.add('show'); setTimeout(() => $('toast').classList.remove('show'), 2200); }
+  function showLogin(m) { $('le').textContent = m || ''; $('lp').value = ''; $('login').style.display = 'flex'; }
+  function logout(m) { pass = ''; try { localStorage.removeItem('ckPass'); } catch (e) {} showLogin(m); }
+  function fail(err) { $('list').innerHTML = '<div class="empty">حصل خطأ: ' + esc(err && err.message ? err.message : err) + '</div>'; }
+
+  function call(fn, action, args, params, done) {
+    if (inside) google.script.run.withSuccessHandler(done).withFailureHandler(fail)[fn](...args, pass);
+    else fetch(API_URL + '?' + new URLSearchParams(Object.assign({ action, pass }, params))).then(r => r.json()).then(done).catch(fail);
+  }
+  function ok(res) {
+    if (res && res.error === 'unauthorized') { logout('كلمة السر غلط'); return false; }
+    if (res && res.ok === false) { toast(res.error || 'حصل خطأ'); return false; }
+    return true;
+  }
+
+  function load() {
+    if (!pass) return showLogin();
+    $('list').innerHTML = '<div class="empty">جاري التحميل…</div>';
+    call('listBookings', 'list', [], {}, res => {
+      if (!ok(res)) return;
+      $('login').style.display = 'none';
+      all = res.bookings || [];
+      const br = [...new Set(all.map(b => b.branch).filter(Boolean))];
+      const cur = $('fBranch').value;
+      $('fBranch').innerHTML = '<option value="">كل الفروع</option>' + br.map(b => `<option>${esc(b)}</option>`).join('');
+      $('fBranch').value = cur;
+      $('bl').innerHTML = br.map(b => `<option value="${esc(b)}">`).join('');
+      render();
+    });
+  }
+
+  // 00:00–11:59 بعد نص الليل، فبنرتبها آخر اليوم
+  const key = t => { const [h, m] = String(t).split(':').map(Number); return ((h < 12 ? h + 24 : h) * 60) + (m || 0); };
+  const dayName = d => {
+    const dt = new Date(d + 'T00:00:00'), diff = Math.round((dt - new Date(today() + 'T00:00:00')) / 864e5);
+    const n = dt.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+    return (diff === 0 ? 'اليوم — ' : diff === 1 ? 'بكرة — ' : diff === -1 ? 'امبارح — ' : '') + n;
+  };
+
+  function render() {
+    const d = $('fDate').value, br = $('fBranch').value, st = $('fStatus').value, q = $('fSearch').value.trim().toLowerCase();
+    const rows = all.filter(b =>
+      (!week || d || (b.date >= today() && b.date <= today(6))) &&
+      (!d || b.date === d) && (!br || b.branch === br) && (!st || b.status === st) &&
+      (!q || (b.name + ' ' + b.phone).toLowerCase().includes(q))
+    ).sort((a, b) => a.date.localeCompare(b.date) || key(a.time) - key(b.time));
+
+    const live = rows.filter(r => r.status !== 'ملغي');
+    $('kN').textContent = rows.length;
+    $('kG').textContent = live.reduce((s, r) => s + (parseInt(r.guests) || 0), 0);
+    $('kNew').textContent = rows.filter(r => r.status === 'جديد').length;
+    if (!rows.length) { $('list').innerHTML = '<div class="empty">مفيش حجوزات مطابقة</div>'; return; }
+
+    let html = '', last = '';
+    rows.forEach(b => {
+      if (b.date !== last) { html += `<div class="day">${dayName(b.date)}</div>`; last = b.date; }
+      const cls = b.status === 'ملغي' ? 'no' : b.status === 'مؤكد' ? 'ok' : 'new';
+      const acts = b.status === 'ملغي'
+        ? `<button class="btn b-ok" onclick="setSt(${b.row},'جديد')">استرجاع</button>`
+        : (b.status === 'جديد' ? `<button class="btn b-ok" onclick="setSt(${b.row},'مؤكد')">تأكيد</button>` : '') +
+          `<button class="btn b-no" onclick="setSt(${b.row},'ملغي')">إلغاء</button>`;
+      html += `<div class="card">
+        <div class="time">${esc(b.time)}</div>
+        <div class="info"><b>${esc(b.name)}</b> · ${esc(b.guests)} أشخاص
+          <div class="meta">📞 ${esc(b.phone)}${b.branch ? ' · 📍 ' + esc(b.branch) : ''}</div></div>
+        <span class="badge ${cls}">${esc(b.status)}</span>
+        <div class="acts">${acts}<button class="btn b-wa" onclick="wa(${b.row})">واتساب</button></div>
+      </div>`;
+    });
+    $('list').innerHTML = html;
+  }
+
+  function setSt(row, status) {
+    call('updateStatus', 'updateStatus', [row, status], { row, status }, res => { if (ok(res)) { toast('اتسجلت الحالة: ' + status); load(); } });
+  }
+
+  function wa(row) {
+    const b = all.find(x => x.row === row); if (!b) return;
+    let p = b.phone.replace(/\D/g, ''); if (p.startsWith('0')) p = '2' + p;
+    const m = `أهلاً ${b.name}، حجزك في تشيكن كيكرز ${b.status === 'ملغي' ? 'اتلغى' : 'متأكد'}:\n${dayName(b.date)}\nالساعة ${b.time}\nلعدد ${b.guests} أشخاص${b.branch ? '\nالفرع: ' + b.branch : ''}`;
+    window.open('https://wa.me/' + p + '?text=' + encodeURIComponent(m), '_blank');
+  }
+
+  // ---- أحداث ----
+  function doLogin() { const v = $('lp').value; if (!v) return; pass = v; try { localStorage.setItem('ckPass', v); } catch (e) {} load(); }
+  $('lb').onclick = doLogin;
+  $('lp').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
+  $('outBtn').onclick = () => { logout(); all = []; };
+  $('refBtn').onclick = load;
+  ['fDate', 'fBranch', 'fStatus'].forEach(id => $(id).onchange = () => { if (id === 'fDate') { week = false; document.querySelectorAll('.chip').forEach(c => c.classList.remove('on')); } render(); });
+  $('fSearch').oninput = render;
+  document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
+    document.querySelectorAll('.chip').forEach(x => x.classList.remove('on')); c.classList.add('on');
+    const q = c.dataset.q; week = q === 'week';
+    $('fDate').value = q === 'today' ? today() : q === 'tomorrow' ? today(1) : '';
+    render();
+  });
+  $('addBtn').onclick = () => { $('aDate').value = $('fDate').value || today(); $('addM').style.display = 'flex'; };
+  $('aNo').onclick = () => { $('addM').style.display = 'none'; };
+  $('aOk').onclick = () => {
+    const d = { name: $('aName').value.trim(), phone: $('aPhone').value.trim(), branch: $('aBranch').value.trim(),
+                date: $('aDate').value, time: $('aTime').value, guests: $('aG').value };
+    if (!d.name || !d.date || !d.time) { toast('الاسم والتاريخ والوقت مطلوبين'); return; }
+    call('addBooking', 'add', [d], d, res => { if (ok(res)) { $('addM').style.display = 'none'; ['aName', 'aPhone'].forEach(i => $(i).value = ''); toast('اتضاف الحجز'); load(); } });
+  };
+
+  $('fDate').value = today();
+  load();
+</script>
+</body>
+</html>
